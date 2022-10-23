@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Req, Body, HttpCode, Redirect, Param, UseFilters, ParseIntPipe, HttpStatus, ParseBoolPipe, Query, UsePipes } from '@nestjs/common'
+import { Controller, Get, Post, Req, Body, HttpCode, Redirect, Param, UseFilters, ParseIntPipe, HttpStatus, ParseBoolPipe, Query, UsePipes, DefaultValuePipe } from '@nestjs/common'
 import { Request } from 'express'
 import { HttpExceptionFilter } from 'src/http-exception.filter'
+import { MyParseIntPipe } from 'src/my-parse-int.pipe'
 import { CreateCatDto } from './dto/create-cat.dto'
 import { Cat } from './interfaces/cat.interface'
 import { createCatSchema } from './schemas/create-cat-schema'
+import { UserByUserIdPipe } from './schemas/user-by-userid.pipe'
 import { CatsService } from './services/cats.service'
-import { JoiValidationPipe, ValidationPipe } from './validation.pipe'
 
 @UseFilters(HttpExceptionFilter)
 @Controller('cats')
@@ -19,7 +20,7 @@ export class CatsController {
 
     
     @Post()
-    @UsePipes(new JoiValidationPipe(createCatSchema))
+    // @UsePipes(new JoiValidationPipe(createCatSchema))
     create(@Body() createCatDto: CreateCatDto) : void {
         this.catsService.create(createCatDto)
     }
@@ -28,10 +29,13 @@ export class CatsController {
     @Redirect("https://stackoverflow.com", 301)
     redirectToStackoverflow() {} 
 
+
     @Get(":id")
     async findOne(
-        @Param("id", new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }), ValidationPipe) id: string,
-        @Query("qid", ParseBoolPipe) qid: boolean) : Promise<string> {
+        @Param("id",  MyParseIntPipe, new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: string,
+        @Query("qid", ParseBoolPipe) qid: boolean,
+        @Query("userid", new DefaultValuePipe(111), UserByUserIdPipe) user: Record<string,any>) : Promise<string>{
+        console.log('user is', user)
         return 'You are looking for a cat with id ' + id + ' and qid ' + qid 
     }
 }
