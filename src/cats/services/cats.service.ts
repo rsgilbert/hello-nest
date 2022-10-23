@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Cat } from "../interfaces/cat.interface";
 
 @Injectable()
@@ -9,7 +9,8 @@ export class CatsService {
         return this.cats.push(cat)
     }
 
-    findAll(): Cat[] {
+    findAll(): Cat[] { 
+        throw new HttpException('Bad boy', HttpStatus.NOT_FOUND)
         return this.cats
     }
 
