@@ -16,7 +16,7 @@ export class User {
     isActive: boolean 
 
     
-    @OneToMany(type => Photo, photo => photo.userId)
+    @OneToMany(type => Photo, photo => photo.user, { eager: true})
     photos: Photo[]
 
 }
